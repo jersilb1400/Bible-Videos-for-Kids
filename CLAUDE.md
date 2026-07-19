@@ -15,6 +15,20 @@ The defining design choice: **every stage has an offline fallback**. The whole p
 
 Target audience: children ages 3–8. Content must be gentle, joyful, and safe for kids.
 
+### Current direction (as of 2026-07-19)
+
+**Pivoting from narrated storybook → talking characters with lip-sync.** Reference: Minno "Laugh and Grow Bible" (2D animated, character dialogue, lip-sync, proper music). The current FLUX + cinematic camera motion pipeline produces quality images but no character animation or lip-sync. See `PROGRESS.md` for full evaluation of Higgsfield MCP, Kling.ai MCP, and ComfyUI self-hosted paths.
+
+**Provider tiers (planned):**
+- **Tier 0 (offline fallback):** SVG + ffmpeg cinematic (current, $0)
+- **Tier 1 (current production):** fal FLUX images + local cinematic ($0.50-3/ep)
+- **Tier 2 (no-GPU talking characters):** Higgsfield MCP or Kling.ai MCP (~$20-50/ep)
+- **Tier 3 (cost optimization):** ComfyUI self-hosted on Hetzner/RunPod (~$0.18/ep)
+
+**Kling.ai MCP** (`https://kling.ai/mcp`) — official MCP, per-second billing ($0.042-$0.14/s), native lip sync ($0.07/5s), TTS ($0.035/call), Avatar. Bonus credits NOT usable on MCP — must buy paid credits.
+
+**Higgsfield MCP** (`bridge.higgsfield.ai`) — already integrated in `src/providers/higgsField.ts`. Starter plan (320 free credits) works for images. Video needs Pro. Soul ID for character consistency. `sync_lipsync_3` for lip sync.
+
 ---
 
 ## Quick-start (Cloudflare + Hetzner production)
@@ -51,12 +65,15 @@ Copy `.env.example` to `.env`. Every key is optional — missing keys silently f
 | `OPENROUTER_API_KEY` | story, metadata, safety | offline built-in story |
 | `OPENROUTER_MODEL` | story | `nousresearch/hermes-4-405b` |
 | `OPENROUTER_UTILITY_MODEL` | metadata, safety | `meta-llama/llama-3.3-70b-instruct` |
-| `IMAGE_PROVIDER` | keyframes | `local` (SVG renderer) |
+| `IMAGE_PROVIDER` | keyframes | `fal` (FLUX 2 via fal.ai) |
 | `FAL_API_KEY` | keyframes, animation | — |
 | `FAL_IMAGE_MODEL` | keyframes | `fal-ai/flux-2` |
 | `FAL_VIDEO_MODEL` | animation | `fal-ai/pixverse/v4.5/image-to-video` |
-| `VIDEO_PROVIDER` | animation | `local` (Ken-Burns ffmpeg) |
-| `TTS_PROVIDER` | voiceover | `local` (silent placeholder) |
+| `HIGGSFIELD_API_KEY` | keyframes (Tier 2) | — |
+| `HIGGSFIELD_BASE_URL` | keyframes (Tier 2) | `http://127.0.0.1:48956` (Bridge) |
+| `KLING_API_KEY` | video, lip sync, TTS (planned) | — |
+| `VIDEO_PROVIDER` | animation | `local` (cinematic ffmpeg) |
+| `TTS_PROVIDER` | voiceover | `edge-tts` (free, zero-config) |
 | `ELEVENLABS_API_KEY` | voiceover | — |
 | `ELEVENLABS_VOICE_ID` | voiceover | — |
 | `KOKORO_ENDPOINT` | voiceover | — |
@@ -77,22 +94,25 @@ Copy `.env.example` to `.env`. Every key is optional — missing keys silently f
 
 ```
 1. story      →  2. safety  →  3. voiceover  →  4. images  →  5. animate
-→  6. music   →  7. assemble →  8. thumbnail  →  9. metadata  →  publish
+→  6. lipsync (planned)  →  7. music  →  8. assemble →  9. thumbnail  →  10. metadata  →  publish
 ```
 
-**Critical ordering invariant:** voiceover runs *before* animation. Real TTS clip lengths are probed with `ffprobe` and become each scene's duration, so animation and captions line up exactly with narration. Do not reorder these two stages.
+**Critical ordering invariant:** voiceover runs *before* animation. Real TTS clip lengths are probed with `ffprobe` and become each scene's duration, so animation and burned captions line up exactly with the spoken narration. Do not reorder these two stages.
+
+**Planned: Stage 6 (lipsync)** — between animation and assembly. Takes animated clip + character TTS audio → syncs character mouth to dialogue. Providers: Kling native lip sync API ($0.07/5s) or Higgsfield `sync_lipsync_3`.
 
 | # | Stage | File | Offline | Production |
 |---|-------|------|---------|------------|
 | 1 | Story + script | `src/stages/story.ts` | built-in Daniel story | OpenRouter Hermes |
 | 2 | Kids-safety gate | `src/moderation.ts` | keyword blocklist | OpenRouter utility model |
-| 3 | Voiceover (TTS) | `src/stages/voiceover.ts` | silent `.m4a` | ElevenLabs or Kokoro |
-| 4 | Keyframes (images) | `src/stages/images.ts` | SVG → PNG via resvg | fal Flux 2 / ComfyUI |
-| 5 | Animation (img→video) | `src/stages/animate.ts` | ffmpeg Ken-Burns | fal PixVerse V4.5 / Kling 3 |
-| 6 | Music bed | `src/stages/music.ts` | ffmpeg sine-wave pad | Suno |
-| 7 | Assembly | `src/stages/assemble.ts` | ffmpeg (captions + mux) | same ffmpeg on Hetzner |
-| 8 | Thumbnail | `src/stages/thumbnail.ts` | ffmpeg title card | — |
-| 9 | SEO Metadata | `src/stages/metadata.ts` | template | OpenRouter utility model |
+| 3 | Voiceover (TTS) | `src/stages/voiceover.ts` | **Edge-TTS** (free) | ElevenLabs or Kokoro |
+| 4 | Keyframes (images) | `src/stages/images.ts` | SVG → PNG via resvg | fal Flux 2 / Higgsfield / ComfyUI |
+| 5 | Animation (img→video) | `src/stages/animate.ts` | **FFmpeg cinematic motion + particles** | Higgsfield / Kling.ai / Wan 2.1 |
+| 6 | Lip Sync (planned) | `src/stages/lipsync.ts` (todo) | skip | Kling native / Higgsfield `sync_lipsync_3` |
+| 7 | Music bed | `src/stages/music.ts` | ffmpeg sine-wave pad | Suno |
+| 8 | Assembly | `src/stages/assemble.ts` | ffmpeg (captions + mux) | same ffmpeg on Hetzner |
+| 9 | Thumbnail | `src/stages/thumbnail.ts` | ffmpeg title card | — |
+| 10 | SEO Metadata | `src/stages/metadata.ts` | template | OpenRouter utility model |
 | — | Publish | `src/stages/publish.ts` | writes manifest JSON | YouTube Data API v3 |
 
 ---
@@ -105,7 +125,7 @@ All schemas are validated with **zod** — never trust raw LLM JSON.
 Story
   title       string
   source      string        (Bible passage, e.g. "Daniel 6")
-  lesson      string        (one-line moral for parents)
+  lesson       string        (one-line moral for parents)
   characters  Character[]   (min 1, reused across scenes)
   scenes      Scene[]       (min 3, recommended 5–7)
 
@@ -116,9 +136,15 @@ Character
 
 Scene
   narration   string        (1–2 short sentences, simple words)
+  dialogue    Dialogue[]     (PLANNED — speaker, line, emotion — for talking characters)
   visual      string        (image/animation prompt)
   characters  string[]      (names present in this scene)
   setting     day|night|sunrise|indoor|water|desert
+
+Dialogue (PLANNED — not yet in zod schema)
+  speaker     string        (character name)
+  line        string        (what they say)
+  emotion     string        (happy|sad|afraid|brave|wonder|calm)
 
 Production   (artifact bundle threaded through all stages)
   id, story, sceneImages[], sceneClips[],
@@ -126,7 +152,9 @@ Production   (artifact bundle threaded through all stages)
   metadata, sceneDurations[], publishResult
 ```
 
-**Character consistency mechanism:** each character's `description` and `palette` are injected into every scene prompt. The offline SVG renderer locks colors by palette. Production image models (Flux 2 multi-ref) use the description for identity lock-in across the episode.
+**Character consistency mechanism:** each character's `description` and `palette` are injected into every scene prompt. The offline SVG renderer locks colors by palette. Production image models (Flux 2 multi-ref, Higgsfield Soul ID, Kling reference image) use the description for identity lock-in across the episode.
+
+**Planned: Dialogue support** — the `Scene` schema needs `dialogue[]` to support talking characters (reference: Minno "Laugh and Grow Bible"). This requires: (1) zod schema update, (2) story generator rewrite for character dialogue, (3) per-character TTS with different voices, (4) lip-sync stage to sync character mouths to dialogue audio.
 
 ---
 
@@ -146,17 +174,24 @@ bible-story-studio/          ← repo root when deployed to Bible-Videos-for-Kid
 │   │   ├── story.ts         LLM story generation (offline: built-in Daniel story)
 │   │   ├── voiceover.ts     TTS per scene + ffprobe duration measurement
 │   │   ├── images.ts        Keyframe rendering (offline: SVG via resvg)
-│   │   ├── animate.ts       Image → video clip (offline: Ken-Burns ffmpeg)
+│   │   ├── animate.ts       Image → video clip (offline: cinematic camera motion + particles)
 │   │   ├── music.ts         Background music bed (offline: ffmpeg sine pad)
 │   │   ├── assemble.ts      Final mux: captions + audio concat + music mix
 │   │   ├── thumbnail.ts     1280×720 thumbnail from first keyframe
 │   │   ├── metadata.ts      YouTube SEO title/description/tags
+│   │   ├── stockAssembly.ts Stitch pre-existing stock clips + narration + music
 │   │   └── publish.ts       YouTube upload or mock manifest
 │   └── providers/
 │       ├── openrouter.ts    Minimal OpenRouter/OpenAI-compatible chat client
 │       ├── svgScene.ts      Deterministic flat-vector cartoon SVG renderer
 │       ├── ffmpeg.ts        ffmpeg/ffprobe helpers + caption escaping utilities
-│       └── youtube.ts       YouTube Data API v3 resumable upload (fetch-only)
+│       ├── youtube.ts       YouTube Data API v3 resumable upload (fetch-only)
+│       ├── falFlux.ts       fal.ai FLUX 2 image generation (keyframes)
+│       ├── higgsField.ts    Higgsfield MCP image generation (Tier 2, Bridge)
+│       ├── edgeTts.ts       Microsoft Edge-TTS (free, zero-config)
+│       ├── cameraMotion.ts  FFmpeg zoompan filters (zoom/pan/drift)
+│       ├── particles.ts     Particle overlays (sparkles/fireflies/stars/sunbeams)
+│       └── promptBuilder.ts Pixar-style cartoon prompt templates
 ├── cloudflare/
 │   ├── worker.ts            Full Workflows control plane (all 11 steps, approval gate)
 │   ├── wrangler.jsonc       Wrangler config: Workflow, R2, D1, Cron Trigger
@@ -233,6 +268,30 @@ upload-manifest.json what would be sent to YouTube (mock mode)
 
 ---
 
+## Stock clip assembly
+
+For episodes that incorporate licensed/downloaded 3D footage (e.g. Noah's Ark clips):
+
+```bash
+# 1. Write a manifest JSON describing the clips and their narration
+cp scripts/stock-manifest.example.json my-manifest.json
+# edit my-manifest.json — set clipsDir, title, voice, and clip order
+
+# 2. Run the stock assembly stage
+npm run stock -- --manifest my-manifest.json
+
+# 3. Find the output
+# out/<date>-<slug>/episode.mp4
+```
+
+The manifest schema validates with zod (`StockManifestSchema`). Key features:
+- **Auto-dedupe**: byte-identical clips are skipped (just list everything; the tool finds the 3 unique ones)
+- **Narration fits clip**: narration is trimmed/padded to the clip's fixed duration (opposite of the main pipeline where clip duration follows narration)
+- **Reuses existing pipeline primitives**: edge-tts TTS, C-major music bed, caption burning (if drawtext available)
+- **Scales to 1920×1080** with letterboxing automatically
+
+---
+
 ## Cloudflare + Hetzner production deployment
 
 ```
@@ -241,8 +300,8 @@ Cloudflare Cron (0 15 * * *) → StudioWorkflow (durable, checkpointed)
   step 1:  story              → OpenRouter Nous Hermes 4 405B
   step 2:  safety gate        → keyword blocklist + Llama 3.3 70B
   step 3:  keyframes          → fal.ai Flux 2  (character-consistent)
-  step 4:  animate            → fal.ai PixVerse V4.5  (cartoon style)
-  step 5:  voiceover          → ElevenLabs Rachel  (11_multilingual_v2)
+  step 4:  animate            → **fal.ai PixVerse V4.5 (premium scenes only) / cinematic ffmpeg (default)**
+  step 5:  voiceover          → **Edge-TTS (default) / ElevenLabs Rachel (11_multilingual_v2)**
   step 6:  music              → Suno API  (instrumental)
   step 7:  assemble           → Hetzner render service  (ffmpeg, can't run in Worker)
   step 8:  SEO metadata       → Llama 3.3 70B
@@ -336,3 +395,37 @@ Add `CLOUDFLARE_API_TOKEN` as a GitHub repository secret (Cloudflare Dashboard �
 - Imports in `src/` must end in `.js` even though source files are `.ts`. ESM/NodeNext requirement — do not remove extensions.
 - `out/`, `.env`, `node_modules/`, and `*.log` are gitignored. Never commit them.
 - The Cloudflare Tunnel must be running on Hetzner before the daily cron fires, otherwise step 7 (assemble) will fail and retry.
+
+---
+
+## Agentic Loop Contract
+
+**Verification command** (local development):
+```bash
+npm run typecheck && npm test
+```
+Work is **not done** until this check passes. Paste the check output, not assertions.
+
+**Deployment verification** (production changes):
+```bash
+make typecheck && make deploy && make health-check
+```
+Add `REQUIRE_APPROVAL=true` before any publish-stage change.
+
+**Two-correction rule:** if the same issue is corrected twice, stop, record the lesson, and recommend a fresh session with a better prompt. A clean session beats a long one with accumulated corrections.
+
+**End-of-session learning pass:** before finishing any session, append repeatable lessons below as short imperative rules, delete rules proven unnecessary, and update PROGRESS.md with completed items, failed approaches with why, and the exact next step.
+
+**Model routing:**
+- Orchestrator / feature work: `claude-sonnet-4-6` — scoped subtask, bounded scope
+- Adversarial reviewer (`.claude/agents/reviewer.md`): `claude-sonnet-4-6` — judgment work, never below worker tier
+- Mechanical transforms (file renames, config edits): `claude-haiku-4-5`
+
+**Budget:**
+- Max iterations per feature item: 5
+- Token budget: 20K per session
+- On budget exhaustion: record state in PROGRESS.md and stop cleanly.
+
+**Permissions:** see `.claude/settings.json`. The allow list grants safe operations; the deny list blocks irreversible and external actions. When unsure, default to deny.
+
+**Stop condition:** all items in PROGRESS.md checked off with verification passing, OR a blocking issue is recorded and the loop is paused for human input. Never stop because "it looks done."

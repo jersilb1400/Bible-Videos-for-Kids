@@ -2,3 +2,7 @@ node_modules/
 out/
 .env
 *.log
+.DS_Store
+/.hermes/
+/context-snapshot.json
+/hermes-webui/

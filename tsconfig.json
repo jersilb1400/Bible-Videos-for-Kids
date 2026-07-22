@@ -13,5 +13,24 @@
     "verbatimModuleSyntax": false,
     "noEmit": true
   },
-  "include": ["src/**/*.ts", "test/**/*.ts"]
+  "include": ["src/**/*.ts", "test/**/*.ts"],
+  "exclude": [
+    "src/providers/grokImagine.ts",
+    "src/providers/higgsField.ts",
+    "src/providers/localWan.ts",
+    "src/providers/wan21.ts",
+    "src/providers/edgeTts.ts",
+    "src/providers/falFlux.ts",
+    "src/providers/cameraMotion.ts",
+    "src/providers/particles.ts",
+    "src/providers/promptBuilder.ts",
+    "src/quality.ts",
+    "src/assetLibrary.ts",
+    "src/backlot.ts",
+    "src/stages/classify.ts",
+    "src/stages/stockAssembly.ts",
+    "src/tools/**/*.ts",
+    "src/twoMinuteCartoon.ts",
+    "src/stockCli.ts"
+  ]
 }

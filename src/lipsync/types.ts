@@ -75,6 +75,11 @@ export interface LipSyncTrack {
  *         is a runtime guard, not a Zod parse — the track is expected to come
  *         from our own pipeline stages (Rhubarb adapter, fallback generator)
  *         and is therefore trusted on shape, but never trusted on invariants.
+ *
+ * Check ordering is intentional: per-cue shape (positive width, contiguous,
+ * ordered) is verified BEFORE boundary alignment so a zero-width cue surfaces
+ * with a targeted message rather than the "last cue must end at duration"
+ * diagnostic firing first.
  */
 export function validateLipSyncTrack(track: LipSyncTrack): void {
   if (track.schemaVersion !== 1) {
@@ -93,19 +98,15 @@ export function validateLipSyncTrack(track: LipSyncTrack): void {
       `invalid LipSyncTrack: first cue must start at 0 (got startSec=${first.startSec})`,
     );
   }
-  const last = cues[cues.length - 1]!;
-  // Allow a tiny epsilon for floating-point rounding: 1µs.
+  // Per-cue "start < end" and contiguity/ordering are checked FIRST so a
+  // zero-width or overlapping cue surfaces with a targeted message (rather
+  // than the "last cue must end at duration" check firing first).
   const EPS = 1e-6;
-  if (Math.abs(last.endSec - duration) > EPS) {
-    throw new Error(
-      `invalid LipSyncTrack: last cue must end at audio duration ${duration} (got endSec=${last.endSec})`,
-    );
-  }
   for (let i = 0; i < cues.length; i++) {
     const c = cues[i]!;
     if (!(c.startSec < c.endSec)) {
       throw new Error(
-        `invalid LipSyncTrack: cue ${i} must have startSec < endSec (got [${c.startSec}, ${c.endSec}))`,
+        `invalid LipSyncTrack: cue ${i} must have positive half-open interval startSec < endSec (got [${c.startSec}, ${c.endSec}))`,
       );
     }
     if (i > 0) {
@@ -121,5 +122,11 @@ export function validateLipSyncTrack(track: LipSyncTrack): void {
         );
       }
     }
+  }
+  const last = cues[cues.length - 1]!;
+  if (Math.abs(last.endSec - duration) > EPS) {
+    throw new Error(
+      `invalid LipSyncTrack: last cue must end at audio duration ${duration} (got endSec=${last.endSec})`,
+    );
   }
 }

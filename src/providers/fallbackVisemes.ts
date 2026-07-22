@@ -212,49 +212,78 @@ function distributeRegion(
 // ---------------------------------------------------------------------------
 
 /**
- * Map a single *grapheme token* (a letter, a recognised digraph, or a chunk of
- * punctuation) to a Preston-Blair mouth shape.
+ * Map a *grapheme token* (a letter, a recognised digraph, or a chunk of
+ * punctuation) to a Preston-Blair mouth shape. The token may also be a whole
+ * word: when given a multi-letter word, the function scans for the first
+ * visible *vowel-ish* pattern (a digraph like `oo/aw/eh/ee/ah` anywhere, then
+ * any vowel letter `a/e/i/o/u`) and returns that viseme, because the vowel is
+ * the most visually salient mouth shape inside a word. Single-letter inputs
+ * route directly to that letter's viseme.
  *
- * Rules (case-insensitive, earliest match wins):
+ * Rules (case-insensitive):
  *
+ *   digraphs anywhere → oo→F, aw→E, eh→C, ee→B, ah→D
  *   m / b / p           → A   (bilabial plosive)
  *   f / v               → G   (or B as alternate) — labiodental
  *   l                   → H   (or C as alternate) — lateral
- *   w / oo / u          → F   — labiovelar / rounded
- *   o / aw               → E   — open-mid back rounded
- *   a / ah              → D   — open central
- *   e / eh              → C   — close-mid front
- *   i / ee              → B   — close front
+ *   w / u               → F   — labiovelar / rounded
+ *   o                   → E   
+ *   a                   → D   
+ *   e                   → C   
+ *   i                   → B   
  *   other consonants    → B   (default consonant viseme)
  *   punctuation         → X   (closed mouth / pause)
  *   whitespace / unknown → X  (silence)
  *
- * `word` may be either a single grapheme token (preferred — split first with
- * `splitGraphemes`) or a whole word: when given a word, only the **first**
- * matching grapheme is consulted (the first letter / digraph of the word).
+ * Precedence is: punctuation/whitespace → digraphs (anywhere) → first vowel
+ * letter (for multi-char inputs) → position-0 letter (single-char inputs).
  */
 export function graphemeToViseme(word: string): MouthShape {
   if (word == null) return "X";
   const w = word.toLowerCase().trim();
-  if (w === "") {
-    // Whitespace or empty input → rest / silence.
-    // Note: we treat ' ' (space) as whitespace, not a consonant.
-    return "X";
-  }
-  // Punctuation-only token → X. Match any non-alphanumeric stretch.
-  if (!/[a-z0-9]/.test(w)) {
-    return "X";
-  }
-  // Digraphs / multi-letter patterns checked first (longest match wins).
-  // Order matters: "oo" must win over "o", "aw" over "a", "eh" over "e", "ee" over "i".
-  if (startsWith(w, ["oo"])) return "F";
-  if (startsWith(word, ["aw"])) return "E";
-  if (w.startsWith("eh")) return "C";
-  if (w.startsWith("ee")) return "B";
-  if (w.startsWith("ah")) return "D";
+  if (w === "") return "X";
 
-  // Single-letter vowels.
-  switch (w[0]) {
+  // Punctuation / non-alphanumeric → X (covers " ", ".", ",", "--", etc.).
+  if (!/[a-z0-9]/.test(w)) return "X";
+
+  // --- Multi-character inputs: scan for first vowel-ish pattern --------
+  if (w.length >= 2) {
+    // First, check digraphs in priority order (longest / most specific first).
+    // Scan the word for each digraph; track the earliest occurrence index.
+    type Hit = { idx: number; shape: MouthShape };
+    const digraphs: { pat: string; shape: MouthShape }[] = [
+      { pat: "oo", shape: "F" },
+      { pat: "aw", shape: "E" },
+      { pat: "eh", shape: "C" },
+      { pat: "ee", shape: "B" },
+      { pat: "ah", shape: "D" },
+    ];
+    let best: Hit | null = null;
+    for (const d of digraphs) {
+      const idx = w.indexOf(d.pat);
+      if (idx !== -1) {
+        if (best === null || idx < best.idx) best = { idx, shape: d.shape };
+      }
+    }
+    if (best) return best.shape;
+
+    // No digraph → scan for the first vowel letter.
+    const vowels: Record<string, MouthShape> = {
+      a: "D", e: "C", i: "B", o: "E", u: "F", y: "B",
+    };
+    for (let i = 0; i < w.length; i++) {
+      const ch = w[i]!;
+      if (ch && vowels[ch]) return vowels[ch];
+    }
+    // All-consonant word (e.g. "tsk"): fall through to position-0 switch.
+  }
+
+  // --- Single-character inputs: position-0 letter switch --------------
+  return singleCharViseme(w[0]!);
+}
+
+function singleCharViseme(c: string): MouthShape {
+  switch (c.toLowerCase()) {
     case "m":
     case "b":
     case "p":
@@ -291,13 +320,8 @@ export function graphemeToViseme(word: string): MouthShape {
     case "h":
       return "B";
     default:
-      // Anything else (digits, unknown) → closed mouth.
       return "X";
   }
-}
-
-function startsWith(w: string, prefixes: string[]): boolean {
-  return prefixes.some((p) => w.startsWith(p));
 }
 
 // ---------------------------------------------------------------------------

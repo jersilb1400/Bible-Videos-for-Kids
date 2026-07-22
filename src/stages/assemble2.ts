@@ -53,8 +53,12 @@ export async function assembleEpisode(
     silentVideo,
   ]);
 
+  // Collect temp file paths for cleanup on any path (success or failure)
+  const tempFiles: string[] = [];
+  try {
   // Step 2: Build episode audio (concatenate all speech clips with silence)
   const episodeAudio = join(dirname(options.outputFile), ".episode-audio.wav");
+  tempFiles.push(episodeAudio);
   await buildEpisodeAudio(timeline, speechDir, episodeAudio);
 
   // Step 3: Generate captions (.srt)
@@ -67,6 +71,7 @@ export async function assembleEpisode(
 
   // Step 5: Mix audio with side-chain ducking + master
   const finalAudio = join(dirname(options.outputFile), ".mixed-audio.wav");
+  tempFiles.push(finalAudio);
 
   if (options.musicFile && existsSync(options.musicFile)) {
     // Side-chain ducking: music ducks when speech is active
@@ -92,8 +97,6 @@ export async function assembleEpisode(
       "-ar", "48000",
       finalAudio,
     ]);
-    // If no music, we still need to add silence for the correct duration
-    // Episode audio already has correct duration from buildEpisodeAudio
   }
 
   // Step 6: Mux video + audio. Burn-in captions via libass if available;
@@ -103,8 +106,8 @@ export async function assembleEpisode(
   if (canBurnCaptions) {
     const { copyFileSync } = await import("node:fs");
     const localAss = ".temp-captions.ass";
+    tempFiles.push(localAss);
     copyFileSync(assFile, localAss);
-    try {
       await runffmpeg([
         "-y",
         "-i", silentVideo,
@@ -121,9 +124,6 @@ export async function assembleEpisode(
         "-movflags", "+faststart",
         finalOutput,
       ]);
-    } finally {
-      try { rmSync(localAss, { force: true }); } catch { /* cleanup */ }
-    }
   } else {
     log.info("Subtitle burn-in unavailable (ffmpeg lacks libass). Shipping sidecar .srt captions.");
     await runffmpeg([
@@ -143,20 +143,19 @@ export async function assembleEpisode(
     ]);
   }
 
-  // Cleanup temp files
-  try {
-    rmSync(concatFile, { force: true });
-    rmSync(silentVideo, { force: true });
-    rmSync(episodeAudio, { force: true });
-    rmSync(finalAudio, { force: true });
-  } catch { /* non-critical */ }
-
   log.ok(`Episode assembled: ${finalOutput}`);
   return {
     file: finalOutput,
     durationMs: timeline.totalMs,
     captionsFile,
   };
+  } finally {
+    // Cleanup temp files — always run, even on failure
+    tempFiles.push(concatFile, silentVideo);
+    for (const f of tempFiles) {
+      try { rmSync(f, { force: true }); } catch { /* non-critical */ }
+    }
+  }
 }
 
 /**

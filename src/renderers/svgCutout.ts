@@ -179,7 +179,7 @@ function composeFrameSVG(
       : `translate(${charX} ${charY})`;
 
     characterLayers.push(
-      `<g transform="${flipTransform}">` +
+      `<g data-character="${actor.characterId}" data-mouth="${mouthShape}" transform="${flipTransform}">` +
       bodyInner +
       eyesInner +
       mouthInner +
@@ -328,4 +328,104 @@ export class SvgCutoutRenderer implements HeadlessRenderer {
       ff.on("error", reject);
     });
   }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Public module surface
+// ────────────────────────────────────────────────────────────────────────────
+
+/** Shared singleton instance — the task's canonical `svgCutoutRenderer`
+ * export. Construct once so callers can pass the same renderer object around
+ * without per-call construction. */
+export const svgCutoutRenderer: HeadlessRenderer = new SvgCutoutRenderer();
+
+/** Argument shape for {@link composeFrameSvg}. */
+export interface ComposeFrameSvgOptions {
+  shot: Shot;
+  timeline: ShotTimeline;
+  rigs: Map<string, ResolvedRig>;
+  lipSyncTracks: Map<string, LipSyncTrack>;
+  width: number;
+  height: number;
+  seed: number;
+  /** Zero-indexed frame position within this shot. */
+  frameIndex: number;
+  /** Total frames in the shot (used for camera progress + blink context). */
+  totalFrames: number;
+  /** Optional fps override; defaults to the timeline-implicit rate (24). */
+  fps?: number;
+}
+
+/**
+ * Compose a single frame's SVG string. Exposed as a public function so tests
+ * can inspect the layered SVG (e.g. confirm the right mouth viseme was selected)
+ * without rasterising. Calls the internal {@link composeFrameSVG} after
+ * deriving per-character blink schedules from `seed`.
+ */
+export function composeFrameSvg(opts: ComposeFrameSvgOptions): string {
+  const fps = opts.fps ?? 24;
+  const shotDurationSec = opts.timeline.durationMs / 1000;
+  // Use un-rounded float ms so viseme cue boundaries derived from the same
+  // `frameIndex/fps` arithmetic align with the cue interval checks. Rounding
+  // to integer ms would shift the lookup by up to 1/fps/2 seconds, which can
+  // cross a cue boundary and select the wrong viseme.
+  const frameMs = (opts.frameIndex / fps) * 1000;
+  const shotStartMs = 0;
+  // Reusable fake req carrying the cross-cut fields composeFrameSVG needs.
+  const req: RenderShotRequest = {
+    shot: opts.shot,
+    timeline: opts.timeline,
+    rigs: opts.rigs,
+    lipSyncTracks: opts.lipSyncTracks,
+    width: opts.width,
+    height: opts.height,
+    fps,
+    seed: opts.seed,
+    outputFile: "" as string,
+  };
+  // Pre-generate blink schedules per character — same algorithm as the
+  // renderer, so what the test sees is bit-identical to a real render.
+  const blinkSchedules = new Map<string, Blink[]>();
+  for (const actor of opts.shot.actors) {
+    const charSeed = opts.seed + actor.characterId.charCodeAt(0);
+    blinkSchedules.set(actor.characterId, generateBlinkSchedule(charSeed, shotDurationSec));
+  }
+  return composeFrameSVG(
+    opts.shot,
+    req,
+    opts.rigs,
+    opts.lipSyncTracks,
+    opts.timeline.utterances,
+    shotStartMs,
+    frameMs,
+    blinkSchedules,
+  );
+}
+
+/** Argument shape for {@link buildBlinkSchedule}. */
+export interface BlinkScheduleOptions {
+  /** Deterministic seed (no Math.random). */
+  seed: number;
+  /** Number of frames the schedule should cover. */
+  totalFrames: number;
+  /** Frames per second — needed to convert blink intervals into frame booleans. */
+  fps: number;
+}
+
+/**
+ * Build a per-frame boolean blink schedule: `true` at frames where the
+ * character's eyes are closed, `false` where open. Deterministic — the same
+ * `(seed, totalFrames, fps)` always returns the same array. Derived from the
+ * same {@link generateBlinkSchedule} the renderer uses internally, so test
+ * expectations match on-screen output frame-for-frame.
+ */
+export function buildBlinkSchedule(opts: BlinkScheduleOptions): boolean[] {
+  const durationSec = opts.totalFrames / opts.fps;
+  const blinks = generateBlinkSchedule(opts.seed, durationSec);
+  const out: boolean[] = new Array(opts.totalFrames);
+  for (let f = 0; f < opts.totalFrames; f++) {
+    const t = f / opts.fps;
+    out[f] = isBlinking(blinks, t);
+  }
+  return out;
 }

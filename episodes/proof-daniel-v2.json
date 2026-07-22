@@ -1,0 +1,209 @@
+{
+  "schemaVersion": 2,
+  "title": "Daniel and the Lions' Den",
+  "source": "Daniel 6",
+  "lesson": "When we trust God and keep praying, He stays close and keeps us brave.",
+  "cast": [
+    {
+      "characterId": "daniel",
+      "rigId": "daniel",
+      "voiceId": "en-US-ChristopherNeural"
+    },
+    {
+      "characterId": "darius",
+      "rigId": "darius",
+      "voiceId": "en-US-DavisNeural"
+    }
+  ],
+  "shots": [
+    {
+      "id": "shot-1",
+      "settingId": "window-room",
+      "actors": [
+        {
+          "characterId": "daniel",
+          "x": 0.5,
+          "y": 0.55,
+          "scale": 1.0,
+          "pose": "praying",
+          "facing": "right"
+        }
+      ],
+      "leadIn": {
+        "text": "Every morning, Daniel knelt by his window to pray.",
+        "pauseAfterMs": 500
+      },
+      "dialogue": [
+        {
+          "id": "line-1-1",
+          "speakerId": "daniel",
+          "text": "Good morning, God. Thank you for this new day.",
+          "emotion": "joy",
+          "pauseAfterMs": 300
+        }
+      ],
+      "action": "Daniel kneels at his window, sunlight streaming in",
+      "camera": "push-in"
+    },
+    {
+      "id": "shot-2",
+      "settingId": "palace",
+      "actors": [
+        {
+          "characterId": "darius",
+          "x": 0.5,
+          "y": 0.5,
+          "scale": 1.0,
+          "pose": "neutral",
+          "facing": "right"
+        }
+      ],
+      "leadIn": {
+        "text": "At the palace, King Darius made a new rule.",
+        "pauseAfterMs": 400
+      },
+      "dialogue": [
+        {
+          "id": "line-2-1",
+          "speakerId": "darius",
+          "text": "For thirty days, everyone must pray only to me!",
+          "emotion": "brave",
+          "pauseAfterMs": 500
+        }
+      ],
+      "action": "King Darius on his throne, signing a scroll",
+      "camera": "locked"
+    },
+    {
+      "id": "shot-3",
+      "settingId": "window-room",
+      "actors": [
+        {
+          "characterId": "daniel",
+          "x": 0.5,
+          "y": 0.55,
+          "scale": 1.0,
+          "pose": "praying",
+          "facing": "right"
+        }
+      ],
+      "leadIn": {
+        "text": "But Daniel kept praying to God, just like always.",
+        "pauseAfterMs": 300
+      },
+      "dialogue": [
+        {
+          "id": "line-3-1",
+          "speakerId": "daniel",
+          "text": "I will always pray to God, no matter what.",
+          "emotion": "brave",
+          "pauseAfterMs": 400
+        }
+      ],
+      "action": "Daniel prays calmly while others peek through the door",
+      "camera": "locked"
+    },
+    {
+      "id": "shot-4",
+      "settingId": "lions-den",
+      "actors": [
+        {
+          "characterId": "daniel",
+          "x": 0.4,
+          "y": 0.6,
+          "scale": 1.0,
+          "pose": "neutral",
+          "facing": "right"
+        }
+      ],
+      "leadIn": {
+        "text": "So Daniel was put into a den of lions for the night.",
+        "pauseAfterMs": 500
+      },
+      "dialogue": [
+        {
+          "id": "line-4-1",
+          "speakerId": "daniel",
+          "text": "God, I know You are with me here.",
+          "emotion": "wonder",
+          "pauseAfterMs": 600
+        }
+      ],
+      "action": "Daniel stands peacefully among sleeping lions in the dark",
+      "camera": "push-in"
+    },
+    {
+      "id": "shot-5",
+      "settingId": "lions-den",
+      "actors": [
+        {
+          "characterId": "daniel",
+          "x": 0.5,
+          "y": 0.55,
+          "scale": 1.0,
+          "pose": "neutral",
+          "facing": "right"
+        }
+      ],
+      "leadIn": {
+        "text": "God sent an angel, and the lions did not hurt him.",
+        "pauseAfterMs": 300
+      },
+      "dialogue": [
+        {
+          "id": "line-5-1",
+          "speakerId": "daniel",
+          "text": "Thank You, God, for keeping me safe!",
+          "emotion": "joy",
+          "pauseAfterMs": 400
+        }
+      ],
+      "action": "A soft glowing light over Daniel as the lions sleep peacefully",
+      "camera": "locked"
+    },
+    {
+      "id": "shot-6",
+      "settingId": "sunrise",
+      "actors": [
+        {
+          "characterId": "daniel",
+          "x": 0.35,
+          "y": 0.6,
+          "scale": 1.0,
+          "pose": "neutral",
+          "facing": "right"
+        },
+        {
+          "characterId": "darius",
+          "x": 0.65,
+          "y": 0.6,
+          "scale": 1.0,
+          "pose": "neutral",
+          "facing": "left"
+        }
+      ],
+      "leadIn": {
+        "text": "In the morning, the king was so happy Daniel was safe!",
+        "pauseAfterMs": 300
+      },
+      "dialogue": [
+        {
+          "id": "line-6-1",
+          "speakerId": "darius",
+          "text": "Daniel! Your God is the true God!",
+          "emotion": "joy",
+          "pauseAfterMs": 400
+        },
+        {
+          "id": "line-6-2",
+          "speakerId": "daniel",
+          "text": "He kept me safe all night long.",
+          "emotion": "joy",
+          "pauseAfterMs": 300
+        }
+      ],
+      "action": "King Darius and Daniel stand together at sunrise, smiling",
+      "camera": "pan-right"
+    }
+  ]
+}

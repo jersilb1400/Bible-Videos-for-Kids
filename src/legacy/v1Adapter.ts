@@ -73,7 +73,7 @@ export function adaptV1Story(story: Story): Episode {
 
     return {
       id: `shot-${i + 1}`,
-      settingId: `setting:${scene.setting}`,
+      settingId: scene.setting,
       actors: finalActors,
       leadIn: { text: scene.narration, pauseAfterMs: 400 },
       // No fabricated dialogue: a v1 narration-only scene carries zero lines.

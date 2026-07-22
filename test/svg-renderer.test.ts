@@ -72,6 +72,7 @@ function makeShot(): Shot {
 function makeTimeline(): ShotTimeline {
   return {
     shotId: "shot-r1",
+    startMs: 0,
     startFrame: 0,
     endFrame: 5,
     durationMs: 1000 * 5 / 12,  // ≈416

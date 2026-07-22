@@ -105,7 +105,7 @@ export async function assembleEpisode(
   const canBurnCaptions = await hasSubtitleFilter();
   if (canBurnCaptions) {
     const { copyFileSync } = await import("node:fs");
-    const localAss = ".temp-captions.ass";
+    const localAss = join(dirname(options.outputFile), ".temp-captions.ass");
     tempFiles.push(localAss);
     copyFileSync(assFile, localAss);
       await runffmpeg([

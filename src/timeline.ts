@@ -13,6 +13,8 @@ export interface PlacedUtterance {
 
 export interface ShotTimeline {
   shotId: string;
+  /** Episode-relative integer millisecond at which this shot starts. */
+  startMs: number;
   startFrame: number;
   endFrame: number; // exclusive
   durationMs: number;
@@ -88,6 +90,7 @@ export function compileTimeline(
 
     shots.push({
       shotId: shot.id,
+      startMs: shotStartMs,
       startFrame: cursorFrame,
       endFrame: cursorFrame + shotFrames,
       durationMs: shotDurationMs,

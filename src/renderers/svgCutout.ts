@@ -9,6 +9,18 @@ import type { ResolvedRig } from "../assets.js";
 import type { LipSyncTrack, MouthCue } from "../lipsync/types.js";
 
 // ────────────────────────────────────────────────────────────────────────────
+// XML attribute escaping — prevents SVG/XSS injection from user-controlled IDs.
+// ────────────────────────────────────────────────────────────────────────────
+function escapeXmlAttr(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+// ────────────────────────────────────────────────────────────────────────────
 // Deterministic PRNG (mulberry32) — no Math.random, repeatable across runs.
 // ────────────────────────────────────────────────────────────────────────────
 function mulberry32(seed: number): () => number {
@@ -103,10 +115,12 @@ function composeFrameSVG(
   blinkSchedules: Map<string, Blink[]>,
 ): string {
   const { width, height } = req;
-  const frameSec = (frameMs - shotStartMs) / 1000;
+  const frameSec = frameMs / 1000; // shot-local seconds for blink timing
 
-  // Find the active utterance at this frame time (episode-relative ms)
-  const episodeMs = frameMs;
+  // Find the active utterance at this frame time.
+  // utterances[].startMs are episode-relative; frameMs is shot-local,
+  // so add shotStartMs to convert to episode-relative time.
+  const episodeMs = frameMs + shotStartMs;
   let activeUtterance: PlacedUtterance | null = null;
   for (const u of utterances) {
     if (episodeMs >= u.startMs && episodeMs < u.endMs) {
@@ -179,7 +193,7 @@ function composeFrameSVG(
       : `translate(${charX} ${charY})`;
 
     characterLayers.push(
-      `<g data-character="${actor.characterId}" data-mouth="${mouthShape}" transform="${flipTransform}">` +
+      `<g data-character="${escapeXmlAttr(actor.characterId)}" data-mouth="${escapeXmlAttr(mouthShape)}" transform="${escapeXmlAttr(flipTransform)}">` +
       bodyInner +
       eyesInner +
       mouthInner +
@@ -239,7 +253,9 @@ export class SvgCutoutRenderer implements HeadlessRenderer {
 
     const { shot, timeline, rigs, lipSyncTracks, fps, seed } = req;
     const frameCount = timeline.endFrame - timeline.startFrame;
-    const shotStartMs = 0; // shot-local time for frame generation
+    // utterances store episode-relative milliseconds, while rendered frames
+    // are shot-local. The compiler preserves the exact integer shot offset.
+    const shotStartMs = timeline.startMs;
 
     // Pre-generate blink schedules per character
     const blinkSchedules = new Map<string, Blink[]>();

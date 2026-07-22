@@ -128,8 +128,8 @@ export type ShotActor = z.infer<typeof ShotActorSchema>;
 export const ShotSchema = z.object({
   /** Stable id unique across the episode. */
   id: z.string().min(1),
-  /** Setting/rig key for the background (e.g. "setting:throne-room"). */
-  settingId: z.string().min(1),
+  /** Setting/rig key for the background (e.g. "palace"). Only `[A-Za-z0-9_-]` allowed — used to construct filesystem paths. */
+  settingId: z.string().min(1).regex(/^[A-Za-z0-9_-]+$/, "settingId must be alphanumeric + dash/underscore only (no slashes or dots)"),
   /** Characters visibly on stage in this shot. */
   actors: z.array(ShotActorSchema).min(1),
   /** Optional narration spoken *before* the shot's dialogue, bridging scenes. */
@@ -151,8 +151,8 @@ export type Shot = z.infer<typeof ShotSchema>;
 
 /** Cast entry: binds a canonical characterId to a rig and a voice. */
 export const CharacterRigRefSchema = z.object({
-  /** `characterId` unique within the episode cast. */
-  characterId: z.string().min(1),
+  /** `characterId` of a cast member unique within this episode. Only `[A-Za-z0-9_-]` allowed — emitted into SVG attributes. */
+  characterId: z.string().min(1).regex(/^[A-Za-z0-9_-]+$/, "characterId must be alphanumeric + dash/underscore only"),
   /** Visual rig key the renderer understands (e.g. "rig:daniel"). */
   rigId: z.string().min(1),
   /** TTS voice id (e.g. "voice:daniel"). */

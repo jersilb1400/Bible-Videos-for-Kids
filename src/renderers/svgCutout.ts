@@ -278,12 +278,14 @@ export class SvgCutoutRenderer implements HeadlessRenderer {
     }
 
     // Encode frames to silent H.264 MP4
-    await this.encodeFrames(framePattern, req.outputFile, fps, frameCount, req.width, req.height);
-
-    // Cleanup frame PNGs
-    for (let f = 1; f <= frameCount; f++) {
-      const framePath = join(frameDir, `.frame-${shot.id}-${String(f).padStart(6, "0")}.png`);
-      try { unlinkSync(framePath); } catch { /* may already be gone */ }
+    try {
+      await this.encodeFrames(framePattern, req.outputFile, fps, frameCount, req.width, req.height);
+    } finally {
+      // Cleanup frame PNGs — always run, even if encoding fails
+      for (let f = 1; f <= frameCount; f++) {
+        const framePath = join(frameDir, `.frame-${shot.id}-${String(f).padStart(6, "0")}.png`);
+        try { unlinkSync(framePath); } catch { /* may already be gone */ }
+      }
     }
 
     return {

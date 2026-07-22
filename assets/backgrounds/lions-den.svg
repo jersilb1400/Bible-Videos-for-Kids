@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">
+  <!-- Lions' den: dark cave with soft moonlight -->
+  <defs>
+    <radialGradient id="caveLight" cx="0.5" cy="0.35" r="0.7">
+      <stop offset="0%" stop-color="#3a4a5a" opacity="0.8"/>
+      <stop offset="40%" stop-color="#2a3a4a" opacity="0.9"/>
+      <stop offset="100%" stop-color="#1a2030"/>
+    </radialGradient>
+  </defs>
+  <!-- Cave background -->
+  <rect x="0" y="0" width="1920" height="1080" fill="url(#caveLight)"/>
+  <!-- Cave walls (rough texture) -->
+  <path d="M0 0 L0 1080 L200 1050 L350 1080 L500 1040 L700 1080 L900 1050 L1100 1080 L1300 1040 L1500 1080 L1700 1050 L1920 1080 L1920 0 Z" fill="#2a2a3a" stroke="none"/>
+  <!-- Moonlight beam from above -->
+  <polygon points="850,0 1070,0 1200,400 720,400" fill="#8aa8d0" opacity="0.08"/>
+  <!-- Opening above (sky glimpse) -->
+  <ellipse cx="960" cy="0" rx="220" ry="60" fill="#4a5a7a" opacity="0.4"/>
+  <!-- Stars in opening -->
+  <circle cx="900" cy="15" r="1.5" fill="#f0f0f0"/>
+  <circle cx="950" cy="25" r="1" fill="#f0f0f0"/>
+  <circle cx="1000" cy="15" r="1.5" fill="#f0f0f0"/>
+  <circle cx="1040" cy="30" r="1" fill="#f0f0f0"/>
+  <!-- Floor rocks -->
+  <ellipse cx="300" cy="950" rx="200" ry="40" fill="#1a1a2a" stroke="none"/>
+  <ellipse cx="700" cy="980" rx="250" ry="30" fill="#1a1a2a" stroke="none"/>
+  <ellipse cx="1200" cy="970" rx="220" ry="35" fill="#1a1a2a" stroke="none"/>
+  <ellipse cx="1700" cy="950" rx="180" ry="40" fill="#1a1a2a" stroke="none"/>
+  <!-- Sleeping friendly lion (simplified dark silhouette) -->
+  <ellipse cx="450" cy="870" rx="90" ry="50" fill="#3a3028" stroke="#2a2018" stroke-width="2"/>
+  <circle cx="370" cy="850" r="35" fill="#3a3028" stroke="#2a2018" stroke-width="2"/>
+  <!-- Lion mane -->
+  <path d="M340 820 Q335 805 345 815 Q350 800 360 815 Q365 800 375 815 Q380 810 390 820" fill="#5a4030" stroke="none" opacity="0.4"/>
+  <!-- Another lion, right side -->
+  <ellipse cx="1500" cy="880" rx="90" ry="50" fill="#3a3028" stroke="#2a2018" stroke-width="2"/>
+  <circle cx="1580" cy="860" r="35" fill="#3a3028" stroke="#2a2018" stroke-width="2"/>
+  <path d="M1560 830 Q1555 815 1565 825 Q1570 810 1580 825 Q1585 810 1595 825 Q1600 820 1610 830" fill="#5a4030" stroke="none" opacity="0.4"/>
+  <!-- God's angelic glow (center) -->
+  <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+    <stop offset="0%" stop-color="#fff8e0" stop-opacity="0.25"/>
+    <stop offset="50%" stop-color="#e0d0a0" stop-opacity="0.1"/>
+    <stop offset="100%" stop-color="#e0d0a0" stop-opacity="0"/>
+  </radialGradient>
+  <ellipse cx="960" cy="540" rx="350" ry="350" fill="url(#glow)"/>
+</svg>

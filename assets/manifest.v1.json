@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "characters": [
+    {
+      "id": "daniel",
+      "revision": "1",
+      "body": "characters/daniel/body.svg",
+      "eyes": {
+        "open": "characters/daniel/eyes/open.svg",
+        "closed": "characters/daniel/eyes/closed.svg"
+      },
+      "mouths": {
+        "X": "characters/daniel/mouths/X.svg",
+        "A": "characters/daniel/mouths/A.svg",
+        "B": "characters/daniel/mouths/B.svg",
+        "C": "characters/daniel/mouths/C.svg",
+        "D": "characters/daniel/mouths/D.svg",
+        "E": "characters/daniel/mouths/E.svg",
+        "F": "characters/daniel/mouths/F.svg"
+      },
+      "poses": {
+        "neutral": "characters/daniel/body.svg",
+        "praying": "characters/daniel/body.svg"
+      },
+      "voice": {
+        "providerVoiceId": "en-US-ChristopherNeural",
+        "rate": 0.94,
+        "pitch": 0
+      },
+      "anchors": {
+        "mouth": [
+          0.5,
+          0.41
+        ],
+        "ground": [
+          0.5,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "darius",
+      "revision": "1",
+      "body": "characters/darius/body.svg",
+      "eyes": {
+        "open": "characters/darius/eyes/open.svg",
+        "closed": "characters/darius/eyes/closed.svg"
+      },
+      "mouths": {
+        "X": "characters/darius/mouths/X.svg",
+        "A": "characters/darius/mouths/A.svg",
+        "B": "characters/darius/mouths/B.svg",
+        "C": "characters/darius/mouths/C.svg",
+        "D": "characters/darius/mouths/D.svg",
+        "E": "characters/darius/mouths/E.svg",
+        "F": "characters/darius/mouths/F.svg"
+      },
+      "poses": {
+        "neutral": "characters/darius/body.svg",
+        "thinking": "characters/darius/body.svg"
+      },
+      "voice": {
+        "providerVoiceId": "en-US-DavisNeural",
+        "rate": 1.0,
+        "pitch": -5
+      },
+      "anchors": {
+        "mouth": [
+          0.5,
+          0.41
+        ],
+        "ground": [
+          0.5,
+          1.0
+        ]
+      }
+    }
+  ],
+  "backgrounds": {
+    "palace": "backgrounds/palace.svg",
+    "window-room": "backgrounds/window-room.svg",
+    "lions-den": "backgrounds/lions-den.svg",
+    "sunrise": "backgrounds/sunrise.svg"
+  }
+}

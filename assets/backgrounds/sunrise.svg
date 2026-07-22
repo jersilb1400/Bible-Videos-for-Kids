@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">
+  <!-- Sunrise: warm outdoor, dawn sky -->
+  <defs>
+    <linearGradient id="dawn" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f0c890"/>
+      <stop offset="30%" stop-color="#f5b070"/>
+      <stop offset="60%" stop-color="#e0a060"/>
+      <stop offset="100%" stop-color="#c08050"/>
+    </linearGradient>
+    <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#a08060"/>
+      <stop offset="100%" stop-color="#806040"/>
+    </linearGradient>
+  </defs>
+  <!-- Dawn sky -->
+  <rect x="0" y="0" width="1920" height="680" fill="url(#dawn)"/>
+  <!-- Sun -->
+  <circle cx="960" cy="620" r="100" fill="#fde890" opacity="0.9"/>
+  <circle cx="960" cy="620" r="140" fill="#fde890" opacity="0.3"/>
+  <circle cx="960" cy="620" r="200" fill="#fde890" opacity="0.1"/>
+  <!-- Mountains/hills -->
+  <path d="M0 600 L200 520 L400 580 L600 500 L800 560 L1000 480 L1200 550 L1400 510 L1600 570 L1920 530 L1920 680 L0 680 Z" fill="#a08060" stroke="none" opacity="0.6"/>
+  <path d="M0 640 L300 580 L600 620 L900 560 L1200 610 L1500 570 L1920 620 L1920 680 L0 680 Z" fill="#8a704a" stroke="none" opacity="0.5"/>
+  <!-- Ground -->
+  <rect x="0" y="680" width="1920" height="400" fill="url(#ground)"/>
+  <!-- Path -->
+  <path d="M700 1080 Q860 900 960 800 Q1060 900 1220 1080" fill="#c4a886" stroke="none" opacity="0.4"/>
+  <!-- Trees (silhouettes) -->
+  <rect x="180" y="580" width="12" height="100" fill="#6a4a2a"/>
+  <circle cx="186" cy="565" r="45" fill="#5a8a5a" opacity="0.5"/>
+  <rect x="1750" y="580" width="12" height="100" fill="#6a4a2a"/>
+  <circle cx="1756" cy="565" r="45" fill="#5a8a5a" opacity="0.5"/>
+  <!-- Clouds -->
+  <ellipse cx="350" cy="180" rx="120" ry="30" fill="#fff0e0" opacity="0.4"/>
+  <ellipse cx="1500" cy="200" rx="140" ry="35" fill="#fff0e0" opacity="0.3"/>
+</svg>

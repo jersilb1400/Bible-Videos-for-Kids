@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600" width="400" height="600">
+  <!-- Daniel: kind young man, blue robe, dark hair -->
+  <!-- Body/robe -->
+  <path d="M120 600 L120 340 Q120 280 200 280 Q280 280 280 340 L280 600 Z" fill="#3f6fb5" stroke="#2a4d80" stroke-width="2"/>
+  <!-- Robe trim -->
+  <path d="M120 340 Q120 280 200 280 Q280 280 280 340 L280 350 Q200 320 120 350 Z" fill="#5a8fd5" stroke="none"/>
+  <!-- Belt/sash -->
+  <rect x="120" y="380" width="160" height="14" fill="#d4a843" rx="3"/>
+  <!-- Neck -->
+  <rect x="178" y="250" width="44" height="40" fill="#e8b48a" rx="4"/>
+  <!-- Head -->
+  <ellipse cx="200" cy="210" rx="55" ry="62" fill="#e8b48a" stroke="#d4a070" stroke-width="1.5"/>
+  <!-- Hair -->
+  <path d="M145 180 Q145 140 200 138 Q255 140 255 180 Q255 175 250 172 Q230 165 200 165 Q170 165 150 172 Q145 175 145 180 Z" fill="#3b2a20" stroke="none"/>
+  <path d="M150 172 Q160 150 200 148 Q240 150 250 172 Q230 160 200 160 Q170 160 150 172" fill="#2a1e16" stroke="none" opacity="0.4"/>
+  <!-- Ears -->
+  <ellipse cx="148" cy="215" rx="8" ry="12" fill="#e0a878" stroke="#d4a070" stroke-width="1"/>
+  <ellipse cx="252" cy="215" rx="8" ry="12" fill="#e0a878" stroke="#d4a070" stroke-width="1"/>
+  <!-- Nose -->
+  <path d="M200 215 L195 230 L200 235 L205 230" fill="none" stroke="#c4986a" stroke-width="1.5" stroke-linejoin="round"/>
+  <!-- Eyebrows -->
+  <path d="M175 185 Q180 183 190 185" fill="none" stroke="#3b2a20" stroke-width="2" stroke-linecap="round"/>
+  <path d="M210 185 Q220 183 225 185" fill="none" stroke="#3b2a20" stroke-width="2" stroke-linecap="round"/>
+  <!-- Arms -->
+  <path d="M120 360 L100 440 L95 480 L108 482 L115 440 L135 370" fill="#3f6fb5" stroke="#2a4d80" stroke-width="2"/>
+  <path d="M280 360 L300 440 L305 480 L292 482 L285 440 L265 370" fill="#3f6fb5" stroke="#2a4d80" stroke-width="2"/>
+  <!-- Hands -->
+  <circle cx="101" cy="482" r="10" fill="#e8b48a" stroke="#d4a070" stroke-width="1.5"/>
+  <circle cx="299" cy="482" r="10" fill="#e8b48a" stroke="#d4a070" stroke-width="1.5"/>
+</svg>

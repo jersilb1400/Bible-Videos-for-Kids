@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600" width="400" height="600">
+  <!-- Mouth A: closed/pressed (P/B/M) -->
+  <ellipse cx="200" cy="246" rx="14" ry="4" fill="#c47860" stroke="#8a5a3a" stroke-width="1.5"/>
+  <line x1="186" y1="246" x2="214" y2="246" stroke="#8a4a2a" stroke-width="1.5"/>
+</svg>

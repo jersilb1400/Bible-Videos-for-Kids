@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600" width="400" height="600">
+  <!-- Darius eyes closed (blink) -->
+  <path d="M172 205 Q180 200 188 205" fill="none" stroke="#6b6b6b" stroke-width="2" stroke-linecap="round"/>
+  <path d="M212 205 Q220 200 228 205" fill="none" stroke="#6b6b6b" stroke-width="2" stroke-linecap="round"/>
+</svg>

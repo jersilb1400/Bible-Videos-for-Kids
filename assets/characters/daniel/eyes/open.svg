@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600" width="400" height="600">
+  <!-- Daniel eyes open -->
+  <ellipse cx="180" cy="205" rx="8" ry="9" fill="white" stroke="#3b2a20" stroke-width="1.5"/>
+  <ellipse cx="220" cy="205" rx="8" ry="9" fill="white" stroke="#3b2a20" stroke-width="1.5"/>
+  <circle cx="180" cy="206" r="4" fill="#3b2a20"/>
+  <circle cx="220" cy="206" r="4" fill="#3b2a20"/>
+  <circle cx="181" cy="207" r="1.5" fill="white"/>
+  <circle cx="221" cy="207" r="1.5" fill="white"/>
+</svg>

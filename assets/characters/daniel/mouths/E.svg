@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600" width="400" height="600">
+  <!-- Mouth E: rounded (AO/ER) -->
+  <ellipse cx="200" cy="248" rx="10" ry="8" fill="#8a4030" stroke="#8a5a3a" stroke-width="1.5"/>
+  <ellipse cx="200" cy="248" rx="8" ry="6" fill="#a05040" stroke="none"/>
+</svg>

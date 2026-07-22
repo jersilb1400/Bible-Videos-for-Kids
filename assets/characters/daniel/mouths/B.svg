@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600" width="400" height="600">
+  <!-- Mouth B: slightly open/clenched (consonants, EE) -->
+  <ellipse cx="200" cy="246" rx="13" ry="6" fill="#9a5040" stroke="#8a5a3a" stroke-width="1.5"/>
+  <rect x="189" y="243" width="22" height="4" fill="#f0e0d8" rx="1"/>
+</svg>

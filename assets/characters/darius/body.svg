@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600" width="400" height="600">
+  <!-- King Darius: gentle king, golden crown, purple robe -->
+  <!-- Body/robe -->
+  <path d="M115 600 L115 340 Q115 280 200 280 Q285 280 285 340 L285 600 Z" fill="#7b4fa0" stroke="#5a3870" stroke-width="2"/>
+  <!-- Robe trim -->
+  <path d="M115 340 Q115 280 200 280 Q285 280 285 340 L285 350 Q200 320 115 350 Z" fill="#9b6fc0" stroke="none"/>
+  <!-- Royal collar -->
+  <path d="M160 320 L200 300 L240 320 L240 340 L160 340 Z" fill="#d4a843" stroke="#b89030" stroke-width="1.5"/>
+  <!-- Belt -->
+  <rect x="115" y="380" width="170" height="16" fill="#d4a843" rx="3"/>
+  <circle cx="200" cy="388" r="6" fill="#f0d060" stroke="#b89030" stroke-width="1"/>
+  <!-- Neck -->
+  <rect x="178" y="250" width="44" height="40" fill="#e0a878" rx="4"/>
+  <!-- Head -->
+  <ellipse cx="200" cy="210" rx="55" ry="62" fill="#e0a878" stroke="#c4985a" stroke-width="1.5"/>
+  <!-- Hair (grey, shorter) -->
+  <path d="M148 178 Q148 148 200 145 Q252 148 252 178 Q252 172 248 170 Q230 163 200 163 Q170 163 152 170 Q148 172 148 178 Z" fill="#6b6b6b" stroke="none"/>
+  <path d="M150 170 Q180 160 200 160 Q220 160 250 170" fill="#5a5a5a" stroke="none" opacity="0.3"/>
+  <!-- Crown -->
+  <path d="M160 148 L165 128 L178 142 L200 125 L222 142 L235 128 L240 148 Z" fill="#d4a843" stroke="#b89030" stroke-width="1.5"/>
+  <circle cx="200" cy="135" r="3" fill="#c04040" stroke="none"/>
+  <rect x="158" y="146" width="84" height="6" fill="#d4a843" stroke="#b89030" stroke-width="1"/>
+  <!-- Beard -->
+  <path d="M170 240 Q200 260 230 240 Q225 255 200 258 Q175 255 170 240" fill="#6b6b6b" stroke="none" opacity="0.5"/>
+  <!-- Ears -->
+  <ellipse cx="148" cy="215" rx="8" ry="12" fill="#d8a070" stroke="#c4985a" stroke-width="1"/>
+  <ellipse cx="252" cy="215" rx="8" ry="12" fill="#d8a070" stroke="#c4985a" stroke-width="1"/>
+  <!-- Nose -->
+  <path d="M200 215 L195 230 L200 235 L205 230" fill="none" stroke="#a8880a" stroke-width="1.5" stroke-linejoin="round"/>
+  <!-- Eyebrows (bushy) -->
+  <path d="M173 185 Q180 183 192 186" fill="none" stroke="#6b6b6b" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M208 186 Q220 183 227 185" fill="none" stroke="#6b6b6b" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Arms -->
+  <path d="M115 360 L95 440 L90 480 L103 482 L110 440 L130 370" fill="#7b4fa0" stroke="#5a3870" stroke-width="2"/>
+  <path d="M285 360 L305 440 L310 480 L297 482 L290 440 L270 370" fill="#7b4fa0" stroke="#5a3870" stroke-width="2"/>
+  <!-- Hands -->
+  <circle cx="96" cy="482" r="10" fill="#e0a878" stroke="#c4985a" stroke-width="1.5"/>
+  <circle cx="304" cy="482" r="10" fill="#e0a878" stroke="#c4985a" stroke-width="1.5"/>
+</svg>

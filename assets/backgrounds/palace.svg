@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">
+  <!-- Palace interior: warm throne room -->
+  <defs>
+    <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d4b896"/>
+      <stop offset="60%" stop-color="#c4a886"/>
+      <stop offset="100%" stop-color="#a48866"/>
+    </linearGradient>
+    <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8a7060"/>
+      <stop offset="100%" stop-color="#6a5040"/>
+    </linearGradient>
+  </defs>
+  <!-- Wall -->
+  <rect x="0" y="0" width="1920" height="780" fill="url(#wall)"/>
+  <!-- Floor -->
+  <rect x="0" y="780" width="1920" height="300" fill="url(#floor)"/>
+  <!-- Columns -->
+  <rect x="140" y="100" width="60" height="700" fill="#e8d8c0" rx="4"/>
+  <rect x="1720" y="100" width="60" height="700" fill="#e8d8c0" rx="4"/>
+  <!-- Column capitals -->
+  <rect x="125" y="95" width="90" height="20" fill="#f0e8d8" rx="2"/>
+  <rect x="1705" y="95" width="90" height="20" fill="#f0e8d8" rx="2"/>
+  <!-- Throne -->
+  <rect x="820" y="350" width="280" height="240" fill="#8a6a4a" rx="8" stroke="#6a4a2a" stroke-width="3"/>
+  <rect x="850" y="200" width="220" height="170" fill="#8a6a4a" rx="8" stroke="#6a4a2a" stroke-width="3"/>
+  <rect x="820" y="590" width="280" height="30" fill="#6a4a2a"/>
+  <path d="M850 210 L960 170 L1070 210 L1070 280 L850 280 Z" fill="#d4a843" stroke="#b89030" stroke-width="2" opacity="0.85"/>
+  <!-- Arched window -->
+  <path d="M380 200 Q380 120 440 120 Q500 120 500 200 L500 400 L380 400 Z" fill="#87ceeb" stroke="#a08060" stroke-width="4"/>
+  <rect x="435" y="120" width="10" height="280" fill="#a08060" stroke="none"/>
+  <rect x="380" y="260" width="120" height="10" fill="#a08060" stroke="none"/>
+  <!-- Decorative arches -->
+  <path d="M1500 200 Q1500 120 1560 120 Q1620 120 1620 200 L1620 400 L1500 400 Z" fill="#87ceeb" stroke="#a08060" stroke-width="4"/>
+  <rect x="1555" y="120" width="10" height="280" fill="#a08060" stroke="none"/>
+  <rect x="1500" y="260" width="120" height="10" fill="#a08060" stroke="none"/>
+  <!-- Ceiling trim -->
+  <rect x="0" y="80" width="1920" height="25" fill="#b89070" stroke="#8a6a4a" stroke-width="2"/>
+  <!-- Floor pattern -->
+  <line x1="0" y1="850" x2="1920" y2="850" stroke="#5a4030" stroke-width="2" opacity="0.3"/>
+  <line x1="0" y1="950" x2="1920" y2="950" stroke="#5a4030" stroke-width="2" opacity="0.3"/>
+</svg>

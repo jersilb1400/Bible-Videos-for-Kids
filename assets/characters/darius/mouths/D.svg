@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600" width="400" height="600">
+  <!-- Mouth D: wide open (AA) -->
+  <ellipse cx="200" cy="250" rx="16" ry="13" fill="#7a4030" stroke="#7a6a5a" stroke-width="1.5"/>
+  <ellipse cx="200" cy="250" rx="14" ry="11" fill="#905040" stroke="none"/>
+  <ellipse cx="200" cy="257" rx="6" ry="2" fill="#5a3020" stroke="none"/>
+</svg>

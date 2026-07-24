@@ -1,0 +1,21 @@
+{
+  "title": "My Episode Title",
+  "clipsDir": "/path/to/downloaded/clips",
+  "musicVolume": 0.7,
+  "voice": "jenny",
+  "dedupe": true,
+  "clips": [
+    {
+      "file": "clip1.mp4",
+      "narration": "Narration spoken over this clip. Keep it shorter than the clip's duration."
+    },
+    {
+      "file": "clip2.mp4",
+      "narration": "Two by two, the animals came. This text is spoken by Edge-TTS (free, offline)."
+    },
+    {
+      "file": "clip3.mp4",
+      "narration": "The final scene. The assembled episode lands in out/<date>-<slug>/episode.mp4."
+    }
+  ]
+}

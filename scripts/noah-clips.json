@@ -1,0 +1,21 @@
+{
+  "title": "Noah's Ark — Building the Boat",
+  "clipsDir": "/Users/jeremysilbernagel/Downloads/Noah clips",
+  "musicVolume": 0.7,
+  "voice": "jenny",
+  "dedupe": true,
+  "clips": [
+    {
+      "file": "Noah vid 3.mp4",
+      "narration": "Noah listened to God, and with his sons, he built a giant ark."
+    },
+    {
+      "file": "Noah vid 2.mp4",
+      "narration": "Two by two, all the animals came, and Noah's family gave thanks to God."
+    },
+    {
+      "file": "noah vid 1.mp4",
+      "narration": "One by one, the animals climbed aboard, safe inside the ark."
+    }
+  ]
+}

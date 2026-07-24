@@ -6,3 +6,5 @@ out/
 /.hermes/
 /context-snapshot.json
 /hermes-webui/
+/models/
+.venv-mlx/

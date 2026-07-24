@@ -1,5 +1,6 @@
 import type { LipSyncTrack, MouthCue } from "./types.js";
 import type { MouthShape } from "../types.js";
+import { execFile } from "node:child_process";
 
 export interface AnalyzeOptions {
   utteranceId: string;
@@ -20,19 +21,15 @@ export async function analyzeUtterance(opts: AnalyzeOptions): Promise<LipSyncTra
 }
 
 async function fallbackAnalyze(opts: AnalyzeOptions): Promise<LipSyncTrack> {
-  // Read the audio file and generate a basic lip-sync track
-  const { readFileSync, statSync } = await import("node:fs");
+  const { readFileSync } = await import("node:fs");
   const { createHash } = await import("node:crypto");
 
   const audioData = readFileSync(opts.audioPath);
   const sha256 = createHash("sha256").update(audioData).digest("hex");
-  const stat = statSync(opts.audioPath);
 
-  // Estimate duration from file size (16-bit mono 48kHz)
-  // WAV header is 44 bytes, rest is 2 bytes per sample
-  const dataSize = audioData.length - 44;
-  const sampleRate = 48000;
-  const durationSec = dataSize > 0 ? dataSize / (sampleRate * 2) : 1.0;
+  // Use ffprobe for accurate duration — the old file-size heuristic assumed
+  // raw 16-bit PCM at 48kHz, which is wrong for edge-tts MP3/WAV output.
+  const durationSec = await probeAudioDuration(opts.audioPath);
 
   // Simple grapheme-based viseme mapping (proportional distribution)
   const cues = generateFallbackCues(opts.text, durationSec);
@@ -95,4 +92,41 @@ function graphemeToViseme(char: string): MouthShape {
   if (/[i]/.test(lower)) return "B";
   if (/[bcdfgjklmnprstvwxz]/.test(lower)) return "B";
   return "X"; // spaces, punctuation, rest
+}
+
+/**
+ * Probe audio duration in seconds using ffprobe.
+ * Works correctly for WAV, MP3, and any format ffprobe supports.
+ * Falls back to 1.0s if ffprobe is unavailable.
+ */
+function probeAudioDuration(filePath: string): Promise<number> {
+  return new Promise((pResolve, pReject) => {
+    const child = execFile(
+      "ffprobe",
+      [
+        "-v", "error",
+        "-show_entries", "format=duration",
+        "-of", "default=noprint_wrappers=1:nokey=1",
+        filePath,
+      ],
+      { timeout: 5_000 },
+    );
+    let stdout = "";
+    child.stdout?.on("data", (chunk: Buffer) => (stdout += chunk.toString()));
+    child.stderr?.on("data", () => { /* swallow */ });
+    child.on("close", (code: number | null) => {
+      if (code !== 0) {
+        // ffprobe failed — fall back to a default rather than crashing the pipeline
+        pResolve(1.0);
+        return;
+      }
+      const seconds = parseFloat(stdout.trim());
+      if (!Number.isFinite(seconds) || seconds <= 0) {
+        pResolve(1.0);
+        return;
+      }
+      pResolve(seconds);
+    });
+    child.on("error", () => pResolve(1.0));
+  });
 }

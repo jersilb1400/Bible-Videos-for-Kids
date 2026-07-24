@@ -1,24 +1,22 @@
 import { spawn } from "node:child_process";
+import { resolveVoice } from "./voiceRegistry.js";
 
 /**
  * Edge-TTS provider — free, zero-config, high-quality children's narration.
  * Requires `edge-tts` Python package installed:
  *   pip install edge-tts
  *
- * Voice options (use the short name in config):
+ * Voice options: pass a character ID ("narrator", "daniel", "mother"),
+ * a legacy rig key ("jenny", "guy", "maisie", "aria"), or a raw Microsoft
+ * voice name ("en-US-GuyNeural"). Unrecognised keys fall back to the default.
+ * See voiceRegistry.ts for the full roster.
+ *
+ * Example voice keys:
  *   jenny  → en-US-JennyNeural   — warm female (default, good for kids)
  *   guy    → en-US-GuyNeural     — friendly male
  *   maisie → en-GB-MaisieNeural  — British child voice (best for kids' content!)
  *   aria   → en-US-AriaNeural    — expressive female
- *   default→ en-US-JennyNeural
  */
-const VOICE_MAP: Record<string, string> = {
-  jenny: "en-US-JennyNeural",
-  guy: "en-US-GuyNeural",
-  maisie: "en-GB-MaisieNeural",
-  aria: "en-US-AriaNeural",
-  default: "en-US-JennyNeural",
-};
 
 /** Rate at which speech is delivered. 1.0 = normal, 1.2 = slightly faster for kids. */
 const RATE_DEFAULT = "+0%";
@@ -34,8 +32,7 @@ export class EdgeTtsProvider {
     voice?: string,
     rate?: string,
   ): Promise<void> {
-    const voiceKey = voice ?? "default";
-    const voiceId = VOICE_MAP[voiceKey]!;
+    const voiceId = resolveVoice(voice);
     const speechRate: string = rate ?? RATE_DEFAULT;
 
     return new Promise((resolve, reject) => {

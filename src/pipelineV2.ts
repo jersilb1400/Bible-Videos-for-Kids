@@ -6,6 +6,8 @@ import { generateSpeech } from "./stages/speech.js";
 import { compileTimeline, type EpisodeTimeline } from "./timeline.js";
 import { loadManifest, resolveRig, type RigManifest, type ResolvedRig } from "./assets.js";
 import { svgCutoutRenderer } from "./renderers/svgCutout.js";
+import { createMlxRenderer } from "./renderers/mlxRenderer.js";
+import type { HeadlessRenderer } from "./renderers/types.js";
 import { analyzeUtterance } from "./lipsync/analyze.js";
 import { assembleEpisode, type AssemblyOptions } from "./stages/assemble2.js";
 import { join } from "node:path";
@@ -28,6 +30,36 @@ export interface PipelineResult {
   outputFile: string;
   captionsFile: string;
   durationMs: number;
+}
+
+/**
+ * Resolve which {@link HeadlessRenderer} to drive the per-shot render phase
+ * with, based on `config.video.renderer` (set from the `RENDERER` env var).
+ *
+ *   - `"svg"` (default) → {@link svgCutoutRenderer}. Fully offline, zero
+ *     external dependencies; the original behaviour.
+ *   - `"mlx"`           → MLX Wan 2.2 / LTX-2 via the local `mlx-video`
+ *     Python adapter. Constructed fresh so env vars (`MLX_BACKEND`,
+ *     `MLX_MODEL`, …) are read at selection time, not module load. The MLX
+ *     module defers all Python/venv resolution to `renderShot`, so simply
+ *     importing it is side-effect free and gives a clear error path inside
+ *     the renderer rather than at boot.
+ *
+ * Unknown values fall back to the SVG renderer with a warning, so a typo in
+ * `RENDERER` never crashes the pipeline.
+ */
+export function selectRenderer(): HeadlessRenderer {
+  const choice = config.video.renderer.trim().toLowerCase();
+  switch (choice) {
+    case "mlx":
+      return createMlxRenderer();
+    case "svg":
+    default:
+      if (choice && choice !== "svg") {
+        log.warn(`Unknown renderer "${choice}"; falling back to svgCutout`);
+      }
+      return svgCutoutRenderer;
+  }
 }
 
 /**
@@ -83,19 +115,20 @@ export async function runPipelineV2(opts: PipelineOptions): Promise<PipelineResu
     }
   }
   log.info(`Lip-sync tracks: ${lipSyncTracks.size}`);
-
   // Phase 4: Render each shot
   const shotClips: { file: string; timeline: any }[] = [];
   const width = opts.width ?? 1280;
   const height = opts.height ?? 720;
   const seed = opts.seed ?? 42;
+  const renderer = selectRenderer();
+  log.info(`Renderer: ${renderer.id} (RENDERER=${config.video.renderer})`);
   let shotIdx = 0;
   for (const shot of episode.shots) {
     const shotTimeline = timeline.shots[shotIdx]!;
     const shotFile = join(storage.root, `shots/${shot.id}.mp4`);
 
     log.info(`Rendering shot ${shotIdx + 1}/${episode.shots.length}: ${shot.id}`);
-    const rendered = await svgCutoutRenderer.renderShot({
+    const rendered = await renderer.renderShot({
       shot,
       timeline: shotTimeline,
       rigs,

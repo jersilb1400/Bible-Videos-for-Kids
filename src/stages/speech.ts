@@ -49,7 +49,7 @@ async function synthesizeLine(
   const req: SpeechRequest = {
     utteranceId: line.id,
     speakerId: line.speakerId,
-    voiceId: line.speakerId, // resolved through rig manifest in production
+    voiceId: line.speakerId, // character ID — resolved to MS voice via voiceRegistry in provider
     text: line.text,
     emotion: line.emotion,
     rate: 1.0,

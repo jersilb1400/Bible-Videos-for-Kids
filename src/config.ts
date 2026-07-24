@@ -46,6 +46,8 @@ export const config = {
     provider: env("VIDEO_PROVIDER", "local"),
     falKey: env("FAL_API_KEY"),
     falModel: env("FAL_VIDEO_MODEL", "fal-ai/pixverse/v4.5/image-to-video"),
+    /** HeadlessRenderer selector: "svg" (default) → svgCutout, "mlx" → MLX. */
+    renderer: env("RENDERER", "svg"),
   },
   tts: {
     provider: env("TTS_PROVIDER", "local"),

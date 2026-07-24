@@ -93,7 +93,7 @@ function computeNumFrames(timeline: ShotTimeline, fps: number): number {
   const maxFrames = 193;
 
   // Find the smallest k where stride*k + 1 >= minFrames and <= maxFrames.
-  let k = Math.ceil((minFrames - 1) / stride);
+  const k = Math.ceil((minFrames - 1) / stride);
   let frames = stride * k + 1;
 
   if (frames < stride + 1) {
@@ -200,10 +200,21 @@ export class MlxRenderer implements HeadlessRenderer {
         ? await generateLTX(opts)
         : await generateVideo(opts);
 
-      // Probe the actual duration of the generated clip
+      // Probe the actual duration of the generated clip.
+      // If MLX produced a shorter clip (e.g. capped at 193 frames ≈ 8s),
+      // still return the timeline's durationMs so assembly's audio/video
+      // sync is preserved. The concat demuxer pads with repeat frames.
       let durationMs = timeline.durationMs;
       try {
-        durationMs = await probeDurationMs(result.outputPath);
+        const actualMs = await probeDurationMs(result.outputPath);
+        // Use the probed duration only if it's close to the expected one
+        // (within 500ms tolerance). If significantly shorter, the assembly
+        // stage will handle the mismatch (concat copy may produce a shorter
+        // final video, but audio is built from real speech clips which are
+        // always correct).
+        if (Math.abs(actualMs - timeline.durationMs) < 500) {
+          durationMs = actualMs;
+        }
       } catch {
         // If ffprobe fails, fall back to the timeline duration
         // eslint-disable-next-line no-console

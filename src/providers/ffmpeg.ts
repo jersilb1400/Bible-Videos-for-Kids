@@ -1,4 +1,28 @@
-import { spawn } from "node:child_process";
+import { execSync, spawn } from "node:child_process";
+
+/** Resolve the ffmpeg binary — prefer ffmpeg-full (has drawtext/libfreetype) when available. */
+export function ffmpegBin(): string {
+  // Use FFMPEG_BIN env var if set (useful for CI/custom setups)
+  const envBin = process.env.FFMPEG_BIN;
+  if (envBin) return envBin;
+
+  // Try ffmpeg-full first (has drawtext, libfreetype, libass, harfbuzz)
+  try {
+    const which = execSync("which ffmpeg-full 2>/dev/null", { encoding: "utf8" }).trim();
+    if (which) return which;
+  } catch { /* not available */ }
+
+  // Try Homebrew ffmpeg-full path (macOS)
+  try {
+    const homebrew = execSync("ls /usr/local/opt/ffmpeg-full/bin/ffmpeg 2>/dev/null", { encoding: "utf8" }).trim();
+    if (homebrew) return homebrew;
+  } catch { /* not available */ }
+
+  // Fall back to regular ffmpeg
+  return "ffmpeg";
+}
+
+const FFMPEG_BIN = ffmpegBin();
 
 /** Run a command, rejecting on non-zero exit. Captures stderr for errors. */
 export function run(cmd: string, args: string[]): Promise<void> {
@@ -14,12 +38,37 @@ export function run(cmd: string, args: string[]): Promise<void> {
   });
 }
 
-export const ffmpeg = (args: string[]) => run("ffmpeg", ["-y", "-hide_banner", "-loglevel", "error", ...args]);
+export const ffmpeg = (args: string[]) => run(FFMPEG_BIN, ["-y", "-hide_banner", "-loglevel", "error", ...args]);
+
+/** Check if drawtext filter is available. */
+export function hasDrawtext(): boolean {
+  try {
+    const out = execSync(`${FFMPEG_BIN} -filters 2>/dev/null`, { encoding: "utf8" });
+    return out.includes("drawtext");
+  } catch {
+    return false;
+  }
+}
+
+/** Resolve the ffprobe binary — matches ffmpeg binary source. */
+export function ffprobeBin(): string {
+  const envBin = process.env.FFMPEG_BIN;
+  if (envBin) return envBin.replace(/ffmpeg$/, "ffprobe");
+
+  try {
+    const which = execSync("which ffmpeg-full 2>/dev/null", { encoding: "utf8" }).trim();
+    if (which) return which.replace(/ffmpeg-full$/, "ffprobe-full");
+  } catch { /* not available */ }
+
+  return "ffprobe";
+}
+
+const FFPROBE_BIN = ffprobeBin();
 
 /** Return media duration in seconds via ffprobe. */
 export function probeDuration(file: string): Promise<number> {
   return new Promise((resolveP, reject) => {
-    const child = spawn("ffprobe", [
+    const child = spawn(FFPROBE_BIN, [
       "-v", "error", "-show_entries", "format=duration",
       "-of", "default=noprint_wrappers=1:nokey=1", file,
     ]);

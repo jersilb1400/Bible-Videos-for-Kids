@@ -105,25 +105,31 @@ export async function assembleEpisode(
   const canBurnCaptions = await hasSubtitleFilter();
   if (canBurnCaptions) {
     const { copyFileSync } = await import("node:fs");
-    const localAss = join(dirname(options.outputFile), ".temp-captions.ass");
+    const { tmpdir } = await import("node:os");
+    // Place temp ASS in tmpdir with a safe filename (no special chars).
+    // The libass subtitles filter needs Windows-style escaping:
+    // backslashes, colons, and commas in the path must be escaped.
+    const localAss = join(tmpdir(), `captions-${process.pid}.ass`);
     tempFiles.push(localAss);
     copyFileSync(assFile, localAss);
-      await runffmpeg([
-        "-y",
-        "-i", silentVideo,
-        "-i", finalAudio,
-        "-vf", `subtitles=${localAss}`,
-        "-c:v", "libx264",
-        "-pix_fmt", "yuv420p",
-        "-preset", "fast",
-        "-crf", "18",
-        "-c:a", "aac",
-        "-b:a", "192k",
-        "-ar", "48000",
-        "-shortest",
-        "-movflags", "+faststart",
-        finalOutput,
-      ]);
+    // Escape backslashes, colons, and single quotes for the subtitles filter
+    const filterPath = localAss.replace(/\\/g, "\\\\").replace(/:/g, "\\:").replace(/'/g, "\\'");
+    await runffmpeg([
+      "-y",
+      "-i", silentVideo,
+      "-i", finalAudio,
+      "-vf", `subtitles='${filterPath}'`,
+      "-c:v", "libx264",
+      "-pix_fmt", "yuv420p",
+      "-preset", "fast",
+      "-crf", "18",
+      "-c:a", "aac",
+      "-b:a", "192k",
+      "-ar", "48000",
+      "-shortest",
+      "-movflags", "+faststart",
+      finalOutput,
+    ]);
   } else {
     log.info("Subtitle burn-in unavailable (ffmpeg lacks libass). Shipping sidecar .srt captions.");
     await runffmpeg([
@@ -315,8 +321,9 @@ function msToAssTime(ms: number): string {
 
 /** Check if ffmpeg has the `subtitles` filter (libass). */
 async function hasSubtitleFilter(): Promise<boolean> {
+  const { ffmpegBin } = await import("../providers/ffmpeg.js");
   return new Promise((resolve) => {
-    const ff = spawn("ffmpeg", ["-filters"]);
+    const ff = spawn(ffmpegBin(), ["-filters"]);
     let stdout = "";
     ff.stdout.on("data", (d) => (stdout += d));
     ff.on("close", () => {
@@ -327,8 +334,9 @@ async function hasSubtitleFilter(): Promise<boolean> {
 }
 
 async function runffmpeg(args: string[]): Promise<void> {
+  const { ffmpegBin } = await import("../providers/ffmpeg.js");
   return new Promise((resolve, reject) => {
-    const ff = spawn("ffmpeg", args);
+    const ff = spawn(ffmpegBin(), args);
     let stderr = "";
     ff.stderr.on("data", (d) => (stderr += d));
     ff.on("close", (code) => {

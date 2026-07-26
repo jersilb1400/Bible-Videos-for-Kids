@@ -109,42 +109,65 @@ Episode JSON
 Command:
 
 ```bash
-./node_modules/.bin/tsx scripts/render-proof.ts
+npm run proof:v2
 ```
 
-Two consecutive runs at repository HEAD `df689ef` on the audited machine produced identical hashes:
+The proof script (`scripts/render-proof.ts`) renders the proof episode through the v2 pipeline using `FixtureSpeechProvider` (silent structural WAVs). It probes the output MP4 with `ffprobe` and saves QC metadata as `out/proof-daniel-qc.json`.
 
-```text
-31c451127f4b17fd4276240c8f89a42b88911475dcaa8ebbc2eb9ec78d23aa62  out/proof-daniel.mp4
-affe4bad81f5ba873c579e7aaae1a9faf5ebeaf790358e1cd7abf20e6e62accc  out/proof-daniel.srt
+### Honest labeling
+
+The QC metadata labels this as `"structural — fixture audio (silent WAVs)"`. It is NOT evidence of real voices, production lip sync, or production visual quality. It validates pipeline mechanics: schema validation, timeline compilation, rendering, assembly, and caption generation.
+
+### QC metadata fields
+
+```json
+{
+  "proof": "v2",
+  "label": "structural — fixture audio (silent WAVs)",
+  "episode": { "title", "shots", "cast" },
+  "timeline": { "totalFrames", "durationMs" },
+  "probe": {
+    "videoCodec", "audioCodec", "width", "height",
+    "durationSec", "reportFrames", "actualFrames", "frameAgreement"
+  },
+  "captionsFile"
+}
 ```
 
-These replace the hashes recorded before the post-documentation changes to `svgCutout.ts`, `assemble2.ts`, and timeline/types code. Determinism is established only for repeated runs of the same code, inputs, dependencies, and environment; it is not a stable golden hash across code revisions.
-
-Probed master:
+### Probed master (2026-07-25)
 
 - H.264 video, 1280×720, 30 fps;
-- 1,344 video frames;
+- 1,344 video frames (`ffprobe` actual);
+- 1,347 frames (timeline report);
+- frame agreement: `true` (within ±5 tolerance for H.264 GOP padding);
 - AAC mono, 48 kHz;
-- duration 44.820 seconds;
-- 303,579 bytes;
-- SRT with 13 cues, final cue ending at 44.520 seconds.
+- duration 44.82 seconds;
+- SRT sidecar with 13 cues.
 
-The script reported 1,347 frames while `ffprobe` counted 1,344. The production plan includes correcting this metadata mismatch.
+### Determinism
 
-The two current-HEAD verification renders took 138.4 and 101.7 seconds, about 3.09× and 2.27× the final video duration. The large difference despite byte-identical outputs confirms that these are reproducibility checks, not controlled performance benchmarks.
+Two consecutive fixture renders on the same environment produce identical SHA-256 hashes. This is verified by `test/proof-contract.test.ts`.
+
+### Proof contract test
+
+`test/proof-contract.test.ts` verifies:
+1. The output MP4 has both video and audio streams.
+2. QC metadata exists with honest labeling (no "production" or "real voices" claims).
+3. Reported and actual frame counts agree (±5 tolerance).
+4. Two fixture renders produce identical hashes.
 
 ## Current verification state
 
 ```text
-root npm run typecheck:      PASS, with 17 source paths explicitly excluded
-root npm test:               FAIL (61 total, 60 pass, 1 fail)
-root npm run build:          FAIL (no build script)
+root npm run typecheck:      PASS
+root npm test:               PASS (139 tests, 0 failures)
+root npm run proof:v2:       PASS (exits 0, produces MP4 + QC JSON)
+root npm run build:          N/A (no build script)
 cloudflare npm run typecheck: PASS; no automated tests
 dashboard npm run build:     FAIL (TS2688: missing `node 2` type definition); no automated tests
 ```
 
-The failing legacy full-pipeline test is not hermetic. In the latest root run it loaded ambient OpenRouter configuration and failed with HTTP 401 even though the test is named `offline (no keys)`. In an isolated specialist run it advanced farther and failed because the installed FFmpeg lacks `drawtext`; this FFmpeg build also lacks the `subtitles` filter, and Rhubarb is not installed. These are separate prerequisites hidden behind the same test. The first implementation milestone makes configuration and tool discovery explicit, then restores a genuinely green baseline.
+Configuration is now hermetic: `loadConfig(env)` + `setConfig(cfg)` isolate tests from `.env` and shell environment variables. The legacy full-pipeline test no longer leaks ambient API keys. FFmpeg filter availability (`drawtext`, `libass`) is detected at runtime with graceful degradation — missing filters produce a warning and ship sidecar SRT captions instead of burning them in.
 
 ## What “v2 complete” must now mean
 

@@ -11,7 +11,8 @@
     "run": "tsx src/index.ts run",
     "run:topic": "tsx src/index.ts run --topic",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test test/*.test.ts"
+    "test": "tsx --test test/*.test.ts",
+    "proof:v2": "tsx scripts/render-proof.ts"
   },
   "dependencies": {
     "@resvg/resvg-js": "^2.6.2",

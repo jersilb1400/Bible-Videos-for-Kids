@@ -2,7 +2,7 @@
   // Deploy: npm i -D wrangler @cloudflare/workers-types && npx wrangler deploy
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "bible-story-studio",
-  "main": "cloudflare/worker.ts",
+  "main": "worker.ts",
   "compatibility_date": "2026-05-01",
   "compatibility_flags": ["nodejs_compat"],
   "account_id": "fd5b09ffec9792936392a2fdeddf8590",

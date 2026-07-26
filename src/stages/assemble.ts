@@ -1,11 +1,12 @@
 import { writeFileSync } from "node:fs";
 import { config } from "../config.js";
 import { log } from "../logger.js";
-import { ffmpeg } from "../providers/ffmpeg.js";
+import { ffmpeg, hasDrawtext } from "../providers/ffmpeg.js";
 import type { Storage } from "../storage.js";
 import type { Story } from "../types.js";
 
 const FONT = "/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf";
+const DRAWTEXT_AVAILABLE = hasDrawtext();
 
 /** Wrap caption text into lines (raw — written to a textfile, no escaping). */
 function wrap(text: string, max = 48): string {
@@ -40,27 +41,48 @@ export async function assembleVideo(
   const fontSize = Math.round(config.height * 0.042);
   const segments: string[] = [];
 
+  if (!DRAWTEXT_AVAILABLE) {
+    log.warn("drawtext filter not available — captions will be omitted (install ffmpeg-full for burned captions)");
+  }
+
   for (let i = 0; i < clips.length; i++) {
     const dur = (durations[i] ?? 5).toFixed(2);
-    const capFile = `${capDir}/scene-${String(i).padStart(2, "0")}.txt`;
-    writeFileSync(capFile, wrap(story.scenes[i]!.narration));
-    const drawtext =
-      `drawtext=fontfile=${FONT}:textfile=${capFile}:expansion=none:` +
-      `fontcolor=white:fontsize=${fontSize}:line_spacing=10:` +
-      `box=1:boxcolor=0x000000A0:boxborderw=26:` +
-      `x=(w-text_w)/2:y=h-text_h-(h*0.07)`;
     const seg = `${segDir}/seg-${String(i).padStart(2, "0")}.mp4`;
-    await ffmpeg([
-      "-i", clips[i]!,
-      "-i", narration[i]!,
-      "-filter_complex", `[0:v]${drawtext}[v];[1:a]apad[a]`,
-      "-map", "[v]", "-map", "[a]",
-      "-t", dur,
-      "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-pix_fmt", "yuv420p",
-      "-r", String(config.fps),
-      "-c:a", "aac", "-ar", "44100", "-ac", "2",
-      seg,
-    ]);
+    
+    if (DRAWTEXT_AVAILABLE) {
+      // Full mode: burn captions + attach narration
+      const capFile = `${capDir}/scene-${String(i).padStart(2, "0")}.txt`;
+      writeFileSync(capFile, wrap(story.scenes[i]!.narration));
+      const drawtext =
+        `drawtext=fontfile=${FONT}:textfile=${capFile}:expansion=none:` +
+        `fontcolor=white:fontsize=${fontSize}:line_spacing=10:` +
+        `box=1:boxcolor=0x000000A0:boxborderw=26:` +
+        `x=(w-text_w)/2:y=h-text_h-(h*0.07)`;
+      await ffmpeg([
+        "-i", clips[i]!,
+        "-i", narration[i]!,
+        "-filter_complex", `[0:v]${drawtext}[v];[1:a]apad[a]`,
+        "-map", "[v]", "-map", "[a]",
+        "-t", dur,
+        "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-pix_fmt", "yuv420p",
+        "-r", String(config.fps),
+        "-c:a", "aac", "-ar", "44100", "-ac", "2",
+        seg,
+      ]);
+    } else {
+      // Graceful degradation: no captions, just attach narration
+      await ffmpeg([
+        "-i", clips[i]!,
+        "-i", narration[i]!,
+        "-filter_complex", "[0:v]null[v];[1:a]apad[a]",
+        "-map", "[v]", "-map", "[a]",
+        "-t", dur,
+        "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-pix_fmt", "yuv420p",
+        "-r", String(config.fps),
+        "-c:a", "aac", "-ar", "44100", "-ac", "2",
+        seg,
+      ]);
+    }
     segments.push(seg);
   }
 

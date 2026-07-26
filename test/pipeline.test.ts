@@ -2,10 +2,15 @@ import assert from "node:assert/strict";
 import { existsSync, rmSync } from "node:fs";
 import { test } from "node:test";
 import { Resvg } from "@resvg/resvg-js";
+import { loadConfig, setConfig, resetConfig } from "../src/config.js";
 import { moderate } from "../src/moderation.js";
 import { runPipeline } from "../src/pipeline.js";
 import { renderSceneSvg } from "../src/providers/svgScene.js";
 import { StorySchema, type Story } from "../src/types.js";
+
+// Force fully-offline config so tests are hermetic — immune to the developer's
+// .env file or shell environment variables that might set provider keys.
+setConfig(loadConfig({}, { loadDotEnv: false }));
 
 const SAMPLE: Story = {
   title: "Test",

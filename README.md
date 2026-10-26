@@ -50,7 +50,7 @@ Output lands in `out/<date-id>/`:
 - `images/`, `clips/`, `audio/`, `segments/` — intermediate artifacts
 - `upload-manifest.json` — exactly what *would* be sent to YouTube
 
-Requirements: **Node ≥ 20** and **ffmpeg** on `PATH`. Nothing else.
+Requirements: **Node ≥ 22.23.4** and **ffmpeg** on `PATH`. Nothing else.
 
 ### Go live, one stage at a time
 

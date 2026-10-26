@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Fully autonomous pipeline that writes children's Bible stories, renders cute cartoon animated videos, and publishes them to YouTube.",
   "engines": {
-    "node": ">=20"
+    "node": ">=22.23.4"
   },
   "scripts": {
     "run": "tsx src/index.ts run",

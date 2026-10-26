@@ -42,7 +42,7 @@ make run             # trigger one episode manually (set WORKER_URL first)
 make typecheck       # TypeScript check (worker + render service)
 ```
 
-**Prerequisites:** Node ≥ 20, Bun, `wrangler` (installed by `make deploy`).
+**Prerequisites:** Node ≥ 22.23.4, Bun, `wrangler` (installed by `make deploy`).
 
 ### Local offline pipeline (no keys needed)
 
@@ -52,7 +52,7 @@ npm run run -- --topic "Noah's Ark"          # full offline run → episode.mp4
 npm run typecheck && npm test
 ```
 
-**Hard requirements:** Node ≥ 20 and `ffmpeg`/`ffprobe` on `PATH`. No build step — runs via `tsx`.
+**Hard requirements:** Node ≥ 22.23.4 and `ffmpeg`/`ffprobe` on `PATH`. No build step — runs via `tsx`.
 
 ---
 

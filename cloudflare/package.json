@@ -8,7 +8,7 @@
     "schema": "wrangler d1 execute bible-videos-series-memory --file schema.sql --remote"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250525.0",
+    "@cloudflare/workers-types": "^5.20261023.1",
     "typescript": "^5.8.3",
     "wrangler": "^4.13.2"
   }
